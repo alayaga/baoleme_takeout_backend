@@ -27,7 +27,7 @@ public class AiServiceImpl implements AiService {
 
     @Value("${ai.api.key:}")
     private String apiKey;
-    @Value("${ai.api.url:https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions}")
+    @Value("${ai.api.url:https://dashscope.aliyuncs.com/compatible-mode/v1}")
     private String apiUrl;
     @Value("${ai.api.model:qwen-turbo}")
     private String model;
@@ -73,7 +73,24 @@ public class AiServiceImpl implements AiService {
 
     @Override
     public String chatReply(String userMessage, String sessionId) {
-        String prompt = "你是饱了么外卖平台的AI客服小饱，请用简短友好的语气回复顾客的问题。\n顾客说：" + userMessage;
+        List<Dish> dishes = dishMapper.findAll();
+        StringBuilder menu = new StringBuilder();
+        for (Dish d : dishes) {
+            if ("active".equals(d.getStatus()) && d.getStock() > 0) {
+                menu.append("- ").append(d.getName())
+                    .append(" | ").append(d.getPrice()).append("元")
+                    .append(" | 分类:").append(d.getCategory())
+                    .append(" | 月售:").append(d.getSales())
+                    .append(" | 简介:").append(d.getDescription())
+                    .append("\n");
+            }
+        }
+
+        String prompt = "【重要规则】你只能基于以下菜单信息回答，严禁编造菜单中不存在的菜品。\n\n"
+                + "当前饱了么平台完整菜单：\n" + menu
+                + "\n顾客问：" + userMessage
+                + "\n\n请根据以上菜单信息，用简短友好的语气回复。如果顾客问的菜品不在菜单中，请明确告知没有并推荐菜单中相近的菜品。";
+
         String reply = callAi(prompt);
         if (reply == null || reply.isEmpty()) {
             return "抱歉，我暂时无法回复，请稍后再试或转接人工客服。";
@@ -89,30 +106,44 @@ public class AiServiceImpl implements AiService {
         try {
             Map<String, Object> body = new HashMap<>();
             body.put("model", model);
+            body.put("temperature", 0.7);
+            body.put("max_tokens", 500);
+
             List<Map<String, String>> messages = new ArrayList<>();
-            Map<String, String> msg = new HashMap<>();
-            msg.put("role", "user");
-            msg.put("content", prompt);
-            messages.add(msg);
+            Map<String, String> sysMsg = new HashMap<>();
+            sysMsg.put("role", "system");
+            sysMsg.put("content", "你是饱了么外卖平台的AI助手小饱，回复简洁友好。");
+            messages.add(sysMsg);
+            Map<String, String> userMsg = new HashMap<>();
+            userMsg.put("role", "user");
+            userMsg.put("content", prompt);
+            messages.add(userMsg);
             body.put("messages", messages);
 
             String json = objectMapper.writeValueAsString(body);
+            String url = apiUrl.endsWith("/")
+                    ? apiUrl + "chat/completions"
+                    : apiUrl + "/chat/completions";
+
             Request request = new Request.Builder()
-                    .url(apiUrl)
+                    .url(url)
                     .addHeader("Authorization", "Bearer " + apiKey)
                     .addHeader("Content-Type", "application/json")
                     .post(RequestBody.create(json, MediaType.parse("application/json")))
                     .build();
 
+            log.info("调用AI接口: {}", url);
             try (Response response = httpClient.newCall(request).execute()) {
-                if (response.isSuccessful() && response.body() != null) {
-                    String respBody = response.body().string();
+                String respBody = response.body() != null ? response.body().string() : "";
+                if (response.isSuccessful()) {
                     JsonNode root = objectMapper.readTree(respBody);
                     return root.at("/choices/0/message/content").asText();
+                } else {
+                    log.error("AI接口返回错误 status={}, body={}", response.code(), respBody);
                 }
             }
         } catch (Exception e) {
-            log.error("调用AI接口失败", e);
+            log.error("调用AI接口异常", e);
         }
         return null;
     }
