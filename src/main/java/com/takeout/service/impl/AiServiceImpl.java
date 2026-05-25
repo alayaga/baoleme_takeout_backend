@@ -78,11 +78,11 @@ public class AiServiceImpl implements AiService {
         for (Dish d : dishes) {
             if ("active".equals(d.getStatus()) && d.getStock() > 0) {
                 menu.append("- ").append(d.getName())
-                    .append(" | ").append(d.getPrice()).append("元")
-                    .append(" | 分类:").append(d.getCategory())
-                    .append(" | 月售:").append(d.getSales())
-                    .append(" | 简介:").append(d.getDescription())
-                    .append("\n");
+                        .append(" | ").append(d.getPrice()).append("元")
+                        .append(" | 分类:").append(d.getCategory())
+                        .append(" | 月售:").append(d.getSales())
+                        .append(" | 简介:").append(d.getDescription())
+                        .append("\n");
             }
         }
 
@@ -104,6 +104,22 @@ public class AiServiceImpl implements AiService {
             return null;
         }
         try {
+            // 构建请求体,格式为
+            // {
+            //   "model": "qwen-turbo",
+            //   "temperature": 0.7,
+            //   "max_tokens": 500,
+            //   "messages": [
+            //     {
+            //       "role": "system",
+            //       "content": "你是饱了么外卖平台的AI助手小饱，回复简洁友好。"
+            //     },
+            //     {
+            //       "role": "user",
+            //       "content": "你是饱了么外卖平台智能营养顾问。现有库存菜品如下：\n1 - 宫保鸡丁 (28元, 川菜)\n2 - 酸菜鱼 (38元, 川菜)\n3 - 清蒸鲈鱼 (42元, 粤菜)\n4 - 番茄炒蛋 (12元, 家常菜)\n\n用户标签：[微辣]\n偏好分类：川菜\n用户需求：想吃下饭的\n\n请推荐1-3个最合适的菜品，必须返回严格的JSON格式：{\"recommendationTitle\":\"...\",\"reason\":\"...\",\"items\":[{\"dishId\":\"...\",\"dishName\":\"...\",\"specialReason\":\"...\"}]}"
+            //     }
+            //   ]
+            // }
             Map<String, Object> body = new HashMap<>();
             body.put("model", model);
             body.put("temperature", 0.7);
@@ -121,6 +137,7 @@ public class AiServiceImpl implements AiService {
             body.put("messages", messages);
 
             String json = objectMapper.writeValueAsString(body);
+            log.info("AI接口请求参数: {}", json);            
             String url = apiUrl.endsWith("/")
                     ? apiUrl + "chat/completions"
                     : apiUrl + "/chat/completions";
@@ -133,6 +150,25 @@ public class AiServiceImpl implements AiService {
                     .build();
 
             log.info("调用AI接口: {}", url);
+        //   返回体json示例：
+        // {
+        //   "choices": [
+        //     {
+        //       "message": {
+        //         "role": "assistant",
+        //         "content": "{\"recommendationTitle\":\"下饭神器推荐\",\"reason\":\"根据您的川菜偏好精选两道下饭好菜\",\"items\":[{\"dishId\":\"1\",\"dishName\":\"宫保鸡丁\",\"specialReason\":\"经典川菜，麻辣鲜香超下饭\"},{\"dishId\":\"2\",\"dishName\":\"酸菜鱼\",\"specialReason\":\"酸辣开胃，口感丰富\"}]}"
+        //       },
+        //       "index": 0,
+        //       "finish_reason": "stop"
+        //     }
+        //   ],
+        //   "usage": {
+        //     "prompt_tokens": 180,
+        //     "completion_tokens": 95,
+        //     "total_tokens": 275
+        //   },
+        //   "request_id": "gen-1234567890"
+        // }
             try (Response response = httpClient.newCall(request).execute()) {
                 String respBody = response.body() != null ? response.body().string() : "";
                 if (response.isSuccessful()) {
