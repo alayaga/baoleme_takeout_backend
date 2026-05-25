@@ -27,6 +27,13 @@
         </mvc:message-converters>
     </mvc:annotation-driven>
 
+    <!-- multipart/form-data 上传解析，配合 web.xml 中的 multipart-config 使用 -->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.support.StandardServletMultipartResolver"/>
+
+    <!-- 上传后的菜品图片静态访问路径 -->
+    <mvc:resources mapping="/uploads/**" location="/uploads/"/>
+
     <!-- 静态资源处理 -->
     <mvc:default-servlet-handler/>
 
