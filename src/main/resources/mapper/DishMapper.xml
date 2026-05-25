@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.takeout.mapper.DishMapper">
+
+    <select id="findAll" resultType="Dish">
+        SELECT id, name, price, description, image, category, sales, stock, status
+        FROM dish
+    </select>
+
+    <select id="findById" resultType="Dish">
+        SELECT id, name, price, description, image, category, sales, stock, status
+        FROM dish WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="Dish">
+        INSERT INTO dish (id, name, price, description, image, category, sales, stock, status)
+        VALUES (#{id}, #{name}, #{price}, #{description}, #{image}, #{category},
+                #{sales}, #{stock}, #{status})
+    </insert>
+
+    <update id="update" parameterType="Dish">
+        UPDATE dish
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="image != null">image = #{image},</if>
+            <if test="category != null">category = #{category},</if>
+            <if test="stock != null">stock = #{stock},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM dish WHERE id = #{id}
+    </delete>
+</mapper>

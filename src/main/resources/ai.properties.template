@@ -1,0 +1,5 @@
+# 通义千问 API 配置模板
+# 复制此文件为 ai.properties 并填入你的真实 API Key
+ai.api.key=YOUR_API_KEY_HERE
+ai.api.url=https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
+ai.api.model=qwen-turbo

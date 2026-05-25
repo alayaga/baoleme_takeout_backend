@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.takeout.mapper.ChatMessageMapper">
+
+    <select id="findBySessionId" resultType="com.takeout.entity.ChatMessage">
+        SELECT id, session_id, role, content, timestamp
+        FROM chat_message WHERE session_id = #{sessionId}
+        ORDER BY timestamp ASC
+    </select>
+
+    <insert id="insert" parameterType="com.takeout.entity.ChatMessage">
+        INSERT INTO chat_message (id, session_id, role, content, timestamp)
+        VALUES (#{id}, #{sessionId}, #{role}, #{content}, #{timestamp})
+    </insert>
+</mapper>

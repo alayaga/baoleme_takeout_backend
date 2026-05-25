@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.takeout.mapper.OrderMapper">
+
+    <select id="findAll" resultType="com.takeout.entity.Order">
+        SELECT id, user_id, total_price, status, created_at, address, phone, note
+        FROM orders ORDER BY created_at DESC
+    </select>
+
+    <select id="findById" resultType="com.takeout.entity.Order">
+        SELECT id, user_id, total_price, status, created_at, address, phone, note
+        FROM orders WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.takeout.entity.Order">
+        INSERT INTO orders (id, user_id, total_price, status, created_at, address, phone, note)
+        VALUES (#{id}, #{userId}, #{totalPrice}, #{status}, #{createdAt}, #{address}, #{phone}, #{note})
+    </insert>
+
+    <update id="updateStatus">
+        UPDATE orders SET status = #{status} WHERE id = #{id}
+    </update>
+</mapper>

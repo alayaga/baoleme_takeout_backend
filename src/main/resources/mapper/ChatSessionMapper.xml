@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.takeout.mapper.ChatSessionMapper">
+
+    <select id="findById" resultType="com.takeout.entity.ChatSession">
+        SELECT id, user_id, user_email, mode, status, last_updated
+        FROM chat_session WHERE id = #{id}
+    </select>
+
+    <select id="findByUserId" resultType="com.takeout.entity.ChatSession">
+        SELECT id, user_id, user_email, mode, status, last_updated
+        FROM chat_session WHERE user_id = #{userId}
+    </select>
+
+    <select id="findAll" resultType="com.takeout.entity.ChatSession">
+        SELECT id, user_id, user_email, mode, status, last_updated
+        FROM chat_session ORDER BY last_updated DESC
+    </select>
+
+    <insert id="insert" parameterType="com.takeout.entity.ChatSession">
+        INSERT INTO chat_session (id, user_id, user_email, mode, status, last_updated)
+        VALUES (#{id}, #{userId}, #{userEmail}, #{mode}, #{status}, #{lastUpdated})
+    </insert>
+
+    <update id="updateMode">
+        UPDATE chat_session SET mode = #{mode} WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE chat_session SET status = #{status} WHERE id = #{id}
+    </update>
+
+    <update id="updateLastUpdated">
+        UPDATE chat_session SET last_updated = #{lastUpdated} WHERE id = #{id}
+    </update>
+</mapper>

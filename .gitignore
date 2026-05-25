@@ -1,0 +1,57 @@
+# ==================== 编译输出 ====================
+target/
+out/
+build/
+
+# ==================== IDE 文件 ====================
+.idea/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+.vscode/
+.factorypath
+nbproject/
+*.swp
+*.swo
+
+# ==================== Maven ====================
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+
+# ==================== 系统文件 ====================
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ==================== 日志文件 ====================
+*.log
+logs/
+
+# ==================== API 密钥（绝对不能提交） ====================
+src/main/resources/ai.properties
+
+# ==================== 数据库配置（含密码，按需忽略） ====================
+# src/main/resources/db.properties
+
+# ==================== Tomcat 临时文件 ====================
+work/
+catalina.out
+
+# ==================== Node（如果前后端同仓库） ====================
+node_modules/
+.npm
+package-lock.json

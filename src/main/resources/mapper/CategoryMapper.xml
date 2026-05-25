@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.takeout.mapper.CategoryMapper">
+
+    <select id="findAll" resultType="Category">
+        SELECT id, name, icon FROM category
+    </select>
+
+    <select id="findById" resultType="Category">
+        SELECT id, name, icon FROM category WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="Category">
+        INSERT INTO category (id, name, icon) VALUES (#{id}, #{name}, #{icon})
+    </insert>
+</mapper>
